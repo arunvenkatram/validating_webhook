@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// define http server and server handler
-	gs := GrumpyServerHandler{}
+	gs := VwhServerHandler{}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/validate", gs.serve)
 	server.Handler = mux

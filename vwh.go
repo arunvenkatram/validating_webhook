@@ -12,11 +12,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-//GrumpyServerHandler listen to admission requests and serve responses
-type GrumpyServerHandler struct {
+//VwhServerHandler listen to admission requests and serve responses
+type VwhServerHandler struct {
 }
 
-func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
+func (gs *VwhServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 	var body []byte
 	if r.Body != nil {
 		if data, err := ioutil.ReadAll(r.Body); err == nil {
@@ -56,7 +56,7 @@ func (gs *GrumpyServerHandler) serve(w http.ResponseWriter, r *http.Request) {
 		Response: &v1beta1.AdmissionResponse{
 			Allowed: false,
 			Result: &metav1.Status{
-				Message: "Keep calm and not add more crap in the cluster!",
+				Message: "You got pod name wrong",
 			},
 		},
 	}
