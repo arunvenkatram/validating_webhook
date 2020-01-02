@@ -1,0 +1,79 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arun-val-wh
+  namespace: webhook
+  labels:
+    name: valwh-sel
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    targetPort: 8080
+  selector:
+    name: valwh-sel 
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: arun-val-wh
+  namespace: webhook
+  labels:
+    name: valwh-sel
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: arun-val-wh
+      labels:
+        name: valwh-sel
+    spec:
+      containers:
+        - name: webhook
+          image: valwh:1.0.0
+          args:
+            - -alsologtostderr
+            - --log_dir=/
+            - -v=10
+            - 2>&1
+          resources:
+            limits:
+              memory: 50Mi
+              cpu: 300m
+            requests:
+              memory: 00Mi
+              cpu: 300m
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/certs
+              readOnly: true
+            - name: logs
+              mountPath: /tmp
+          securityContext:
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: arun-secret
+        - name: logs
+          emptyDir: {}
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: arun-val-wh
+webhooks:
+  - name: arun.podnamechk.local
+    clientConfig:
+      service:
+        name: arun-val-wh 
+        namespace: webhook
+        path: "/validate"
+      caBundle: "${CA_BUNDLE}"
+    rules:
+      - operations: ["CREATE","UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    failurePolicy: Ignore
