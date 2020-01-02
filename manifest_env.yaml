@@ -12,9 +12,9 @@ spec:
     port: 443
     targetPort: 8080
   selector:
-    name: valwh-sel 
+    name: valwh-sel
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: arun-val-wh
@@ -23,6 +23,9 @@ metadata:
     name: valwh-sel
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+        name: valwh-sel
   template:
     metadata:
       name: arun-val-wh
@@ -67,7 +70,7 @@ webhooks:
   - name: arun.podnamechk.local
     clientConfig:
       service:
-        name: arun-val-wh 
+        name: arun-val-wh
         namespace: webhook
         path: "/validate"
       caBundle: "${CA_BUNDLE}"
